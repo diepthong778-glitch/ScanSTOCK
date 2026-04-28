@@ -31,6 +31,9 @@ ALLOWED_LABELS = {
     "contract",
     "resume",
     "medical_document",
+    "bank_statement",
+    "school_document",
+    "receipt",
     "unknown",
 }
 

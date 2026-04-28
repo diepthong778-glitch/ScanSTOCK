@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}SCANSTOCK | AI Document Intelligence{% endblock %}
 {% block body_class %}landing-body{% endblock %}
 {% block layout %}
 <div class="landing-shell">
   <nav class="landing-nav">
     <a class="brand-mark" href="{% url 'landing' %}">
-      <span class="brand-icon">S</span>
+      <img class="brand-icon-img" src="{% static 'img/scanstock-logo.svg' %}" alt="" aria-hidden="true">
       <span><strong>SCANSTOCK</strong><small>AI document intelligence</small></span>
     </a>
     <div class="landing-links">
@@ -42,6 +43,7 @@
       </div>
     </div>
     <div class="hero-copy">
+      <img class="hero-icon" src="{% static 'img/scanstock-icon.png' %}" alt="SCANSTOCK app icon">
       <span class="eyebrow">Modern AI productivity for documents</span>
       <h1>SCANSTOCK</h1>
       <p>AI-powered document scanner, recognition engine, OCR text extraction, plagiarism checker, and risk analysis in one clean workspace.</p>
@@ -90,7 +92,7 @@
     <div class="trust-panel">
       <p><strong>Risk Analysis</strong></p>
       <p>Low, medium, or high risk based on OCR quality, expected fields, image quality, and suspicious wording.</p>
-      <small>This result is only an AI-assisted estimate.</small>
+      <small>This result is not a legal verification. Manual review is recommended for important documents.</small>
     </div>
   </section>
 

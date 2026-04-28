@@ -1,0 +1,28 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SCANSTOCK icon">
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M96 134h46V96h36v38h156V96h36v38h46v36h-46v172h46v36h-46v38h-36v-38H178v38h-36v-38H96v-36h46V170H96v-36Z" fill="#0B1D33"/>
+  <path d="M165 116h151l62 63v217H165V116Z" fill="white"/>
+  <path d="M316 116v63h62" fill="#DCEEFF"/>
+  <path d="M195 226h116M195 264h93M195 302h122" stroke="#8AA4BF" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="311" cy="302" r="74" fill="#0C1830" fill-opacity=".18" stroke="url(#cyan)" stroke-width="22"/>
+  <path d="M363 354l54 54" stroke="url(#cyan)" stroke-width="28" stroke-linecap="round"/>
+  <rect x="273" y="269" width="77" height="57" rx="18" fill="#08203A" stroke="#7DD3FC" stroke-width="8"/>
+  <circle cx="297" cy="298" r="7" fill="#7DD3FC"/>
+  <circle cx="326" cy="298" r="7" fill="#7DD3FC"/>
+  <path d="M297 319h29" stroke="#22C55E" stroke-width="7" stroke-linecap="round"/>
+  <path d="M311 252v17M258 298h15M350 298h15" stroke="#7DD3FC" stroke-width="8" stroke-linecap="round"/>
+  <path d="M117 117h58M117 117v58M395 117h-58M395 117v58M117 395h58M117 395v-58M395 395h-58M395 395v-58" stroke="#27C3FF" stroke-width="16" stroke-linecap="round"/>
+  <path d="M132 210h248" stroke="#27C3FF" stroke-width="7" stroke-linecap="round" opacity=".55"/>
+  <defs>
+    <linearGradient id="bg" x1="64" y1="52" x2="448" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07172B"/>
+      <stop offset=".58" stop-color="#0B1220"/>
+      <stop offset="1" stop-color="#11243D"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="250" y1="226" x2="432" y2="411" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7DD3FC"/>
+      <stop offset=".52" stop-color="#27C3FF"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+</svg>

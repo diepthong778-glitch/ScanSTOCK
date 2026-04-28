@@ -3,84 +3,107 @@ from __future__ import annotations
 from typing import Any
 import unicodedata
 
-import cv2
-import numpy as np
-
 
 EXPECTED_FIELDS = {
-    "cccd_id_card": ["ngay sinh", "quoc tich", "noi thuong tru"],
-    "invoice": ["tong tien", "ma so thue", "vat"],
-    "contract": ["ben a", "ben b", "dieu khoan"],
+    "cccd_id_card": ["ngay sinh", "quoc tich", "noi thuong tru", "so dinh danh"],
+    "invoice": ["tong tien", "ma so thue", "vat", "hoa don"],
+    "contract": ["ben a", "ben b", "dieu khoan", "chu ky"],
     "resume": ["experience", "education", "skills"],
-    "medical_document": ["chan doan", "bac si", "don thuoc"],
+    "medical_document": ["chan doan", "bac si", "don thuoc", "benh vien"],
+    "bank_statement": ["account", "transaction", "balance"],
+    "school_document": ["student", "grade", "school"],
+    "receipt": ["total", "paid", "receipt"],
 }
 
 
 def assess_fake_document_risk(
-    original_image: np.ndarray,
-    scanned_image: np.ndarray,
+    *,
     ocr_text: str,
     document_type: str,
-    boundary_found: bool,
+    quality_info: dict[str, Any],
+    boundary_info: dict[str, Any],
+    ocr_info: dict[str, Any],
+    classification_info: dict[str, Any],
 ) -> dict[str, Any]:
     score = 0.0
     reasons: list[str] = []
 
     text = _normalize_text(ocr_text)
-    gray = cv2.cvtColor(scanned_image, cv2.COLOR_BGR2GRAY)
-    blur_score = cv2.Laplacian(gray, cv2.CV_64F).var()
-    brightness = float(np.mean(gray))
-    contrast = float(np.std(gray))
+    quality_score = float(quality_info.get("quality_score", 0.0))
+    boundary_confidence = float(boundary_info.get("boundary_confidence", 0.0))
+    ocr_confidence = float(ocr_info.get("ocr_confidence", 0.0))
+    classification_confidence = float(classification_info.get("confidence", 0.0))
 
-    if not boundary_found:
-        score += 18
-        reasons.append("Document boundary was not confidently detected.")
+    if quality_score < 0.45:
+        score += 0.18
+        reasons.append("Image quality is poor; manual review is recommended.")
+    elif quality_score < 0.65:
+        score += 0.08
+        reasons.append("Image quality is fair and may reduce OCR reliability.")
 
-    if blur_score < 80:
-        score += 18
-        reasons.append("Scanned output is blurry, which reduces verification confidence.")
+    if quality_info.get("blur_score", 0) < 80:
+        score += 0.14
+        reasons.append("Image appears blurry.")
 
-    if brightness < 45 or brightness > 225:
-        score += 12
-        reasons.append("Image brightness is outside a normal scan range.")
+    if quality_info.get("resolution_score", 0) < 0.5:
+        score += 0.12
+        reasons.append("Image resolution is low for reliable verification.")
 
-    if contrast < 25:
-        score += 12
-        reasons.append("Image has unusually low contrast.")
+    if quality_info.get("compression_warning"):
+        score += 0.08
+        reasons.append("Image appears heavily compressed.")
+
+    if quality_info.get("shadow_warning"):
+        score += 0.08
+        reasons.append("Uneven lighting or shadow was detected.")
+
+    if boundary_confidence < 0.45:
+        score += 0.14
+        reasons.append("Paper boundary confidence is low.")
+
+    if ocr_confidence < 0.45:
+        score += 0.16
+        reasons.append("OCR confidence is low.")
 
     if len(text) < 40:
-        score += 18
+        score += 0.12
         reasons.append("OCR extracted very little readable text.")
+
+    if classification_confidence < 0.55 or document_type == "unknown":
+        score += 0.12
+        reasons.append("Document type confidence is low.")
 
     expected = EXPECTED_FIELDS.get(document_type, [])
     if expected:
         missing = [field for field in expected if field not in text]
         if len(missing) >= max(1, len(expected) - 1):
-            score += 14
+            score += 0.12
             reasons.append("Several expected fields for this document type were not found.")
 
     suspicious_terms = ["copy", "sample", "specimen", "void", "fake", "for test"]
     if any(term in text for term in suspicious_terms):
-        score += 20
+        score += 0.18
         reasons.append("OCR found wording commonly used on samples or non-final documents.")
 
-    # This is a risk heuristic, not a forensic conclusion. Keep it below certainty.
-    score = round(min(score, 95.0), 2)
-    if score >= 60:
+    score = round(min(score, 0.95), 2)
+    if score >= 0.60:
         level = "high"
-    elif score >= 30:
+    elif score >= 0.30:
         level = "medium"
     else:
         level = "low"
 
     if not reasons:
-        reasons.append("No strong visual or OCR risk indicators were detected.")
+        reasons.append("No strong suspicious indicators were detected.")
+
+    if score >= 0.30:
+        reasons.append("Manual review is recommended for important documents.")
 
     return {
         "score": score,
         "level": level,
         "reasons": reasons,
-        "disclaimer": "Risk is heuristic and does not prove a document is fake.",
+        "disclaimer": "This is AI-assisted risk analysis, not legal verification.",
     }
 
 

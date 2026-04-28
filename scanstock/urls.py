@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
+from scanstock.api_views import HealthAPIView
 from scanstock import views
 
 urlpatterns = [
@@ -30,6 +31,9 @@ urlpatterns = [
     path('reference-documents/', views.reference_documents_page, name='reference-documents'),
     path('reference-documents/<int:pk>/delete/', views.delete_reference_document, name='delete-reference-document'),
     path('admin/', admin.site.urls),
+    path('api/health', HealthAPIView.as_view(), name='api-health'),
+    path('api/health/', HealthAPIView.as_view(), name='api-health-slash'),
+    path('api/documents/', include('scanner.document_urls')),
     path('api/scanner/', include('scanner.urls')),
     path('api/plagiarism/', include('plagiarism.urls')),
 ]

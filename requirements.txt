@@ -1,12 +1,12 @@
 Django==5.2.13
 djangorestframework==3.17.1
+uvicorn
 opencv-python==4.13.0.92
-Pillow==12.2.0
+numpy
+pillow==12.2.0
 pytesseract==0.3.13
 img2pdf==0.6.3
 scikit-learn==1.8.0
 pandas==3.0.2
 joblib==1.5.3
-RapidFuzz==3.14.5
-# Optional later semantic plagiarism support:
-# sentence-transformers
+rapidfuzz==3.14.5

@@ -30,6 +30,11 @@ class ScanJob(models.Model):
     fake_risk_score = models.FloatField(default=0)
     fake_risk_level = models.CharField(max_length=50, blank=True)
     fake_reasons = models.JSONField(default=list, blank=True)
+    quality_info = models.JSONField(default=dict, blank=True)
+    boundary_info = models.JSONField(default=dict, blank=True)
+    ocr_info = models.JSONField(default=dict, blank=True)
+    classification_info = models.JSONField(default=dict, blank=True)
+    manual_review_recommended = models.BooleanField(default=False)
 
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     error_message = models.TextField(blank=True)

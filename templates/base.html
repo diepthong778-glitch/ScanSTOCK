@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="{% static 'img/favicon.ico' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/scanstock-icon.png' %}">
   <link rel="stylesheet" href="{% static 'css/scanstock.css' %}">
 </head>
 <body class="{% block body_class %}app-body{% endblock %}">
@@ -15,7 +17,7 @@
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <a class="brand-mark" href="{% url 'dashboard' %}" aria-label="SCANSTOCK dashboard">
-        <span class="brand-icon">S</span>
+        <img class="brand-icon-img" src="{% static 'img/scanstock-logo.svg' %}" alt="" aria-hidden="true">
         <span>
           <strong>SCANSTOCK</strong>
           <small>Document intelligence</small>

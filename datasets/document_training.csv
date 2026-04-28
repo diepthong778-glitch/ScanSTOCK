@@ -9,5 +9,11 @@ text,label
 "cv kinh nghiem lam viec hoc van ky nang chung chi",resume
 "benh vien phong kham chan doan bac si don thuoc trieu chung",medical_document
 "medical record hospital diagnosis doctor prescription symptoms",medical_document
+"bank statement account number transaction balance debit credit",bank_statement
+"sao ke ngan hang so tai khoan giao dich so du ghi no ghi co",bank_statement
+"school transcript student grade certificate university course",school_document
+"truong dai hoc sinh vien bang diem chung chi ket qua hoc tap",school_document
+"receipt paid payment cashier total change store purchase",receipt
+"bien lai thanh toan cua hang tong tien tien thua thu ngan",receipt
 "general note informal text without document structure",unknown
 "random page content with no stable business or identity fields",unknown

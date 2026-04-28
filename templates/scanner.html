@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Document Scanner | SCANSTOCK{% endblock %}
 {% block content %}
 <div class="page-heading">
@@ -15,7 +16,7 @@
     <div class="dropzone" id="dropzone">
       <input id="documentInput" name="image" type="file" accept="image/*" capture="environment">
       <div class="dropzone-content">
-        <span class="upload-orbit"></span>
+        <span class="upload-orbit"><img src="{% static 'img/scanstock-logo.svg' %}" alt="" aria-hidden="true"></span>
         <h2>Drop a document image here</h2>
         <p>or capture from your mobile camera</p>
         <div class="button-row">
@@ -33,6 +34,7 @@
           <option value="bw">Black & white scan</option>
           <option value="gray">Gray scan</option>
           <option value="color">Color scan</option>
+          <option value="ocr">OCR optimized</option>
         </select>
       </label>
       <label>
@@ -44,6 +46,7 @@
         </select>
       </label>
       <button class="btn btn-primary btn-full" type="submit">Run AI scan</button>
+      <p class="safe-note">Tip: use good lighting, keep all paper corners visible, and avoid glare.</p>
     </div>
   </section>
 
@@ -60,6 +63,9 @@
   </section>
 
   <section class="error-panel hidden" id="scanError"></section>
+  <section class="warning-panel hidden" id="manualReviewWarning">
+    Result confidence is low. Please upload a clearer image or review manually.
+  </section>
 
   <section class="result-grid hidden" id="scanResult">
     <div class="preview-card">
@@ -73,13 +79,22 @@
 
     <div class="panel result-summary">
       <div class="metric-card"><span>Document type</span><strong id="documentType">Unknown</strong></div>
-      <div class="metric-card"><span>Confidence</span><strong id="documentConfidence">0%</strong></div>
+      <div class="metric-card"><span>Confidence score</span><strong id="documentConfidence">0%</strong></div>
+      <div class="metric-card"><span>OCR confidence</span><strong id="ocrConfidence">0%</strong></div>
+      <div class="metric-card"><span>Quality score</span><strong id="qualityScore">0%</strong></div>
+      <div class="metric-card"><span>Boundary confidence</span><strong id="boundaryConfidence">0%</strong></div>
       <div class="metric-card"><span>Risk level</span><strong id="riskLevel">Unknown</strong></div>
       <div class="metric-card"><span>Risk score</span><strong id="riskScore">0</strong></div>
+      <div class="metric-card"><span>Classification method</span><strong id="classificationMethod">fallback</strong></div>
+      <div class="metric-card"><span>OCR language</span><strong id="ocrLanguage">eng+vie</strong></div>
+      <div class="risk-reasons">
+        <h3>Quality warnings</h3>
+        <ul id="qualityWarnings"></ul>
+      </div>
       <div class="risk-reasons">
         <h3>Suspicious indicators</h3>
         <ul id="riskReasons"></ul>
-        <p>This result is only an AI-assisted estimate.</p>
+        <p>AI-assisted result. This result is not a legal verification. Manual review is recommended for important documents.</p>
       </div>
     </div>
 

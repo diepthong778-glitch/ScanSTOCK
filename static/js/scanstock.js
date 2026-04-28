@@ -72,11 +72,13 @@
     const fileInput = qs("#documentInput");
     const loading = qs("#scanLoading");
     const errorBox = qs("#scanError");
+    const manualReviewWarning = qs("#manualReviewWarning");
     const result = qs("#scanResult");
     const originalPreview = qs("#originalPreview");
     const scannedPreview = qs("#scannedPreview");
     const ocrText = qs("#ocrText");
     const riskReasons = qs("#riskReasons");
+    const qualityWarnings = qs("#qualityWarnings");
     const downloadJpg = qs("#downloadJpg");
     const downloadPdf = qs("#downloadPdf");
 
@@ -125,6 +127,7 @@
       payload.append("lang", qs("#ocrLang")?.value || "eng+vie");
 
       setHidden(errorBox, true);
+      setHidden(manualReviewWarning, true);
       setHidden(result, true);
       setHidden(loading, false);
 
@@ -172,6 +175,14 @@
       const pdfUrl = absoluteUrl(data.pdf_file_url || data.pdf_file);
       const risk = normalizeRisk(data.fake_risk_level);
       const confidence = Number(data.document_confidence || 0);
+      const ocrInfo = data.ocr_info || {};
+      const qualityInfo = data.quality_info || {};
+      const boundaryInfo = data.boundary_info || {};
+      const classificationInfo = data.classification_info || {};
+      const ocrConfidence = Number(ocrInfo.ocr_confidence || 0);
+      const qualityScore = Number(qualityInfo.quality_score || 0);
+      const boundaryConfidence = Number(boundaryInfo.boundary_confidence || 0);
+      const riskScore = Number(data.fake_risk_score || 0);
 
       scannedPreview.src = scannedUrl;
       downloadJpg.href = scannedUrl;
@@ -179,9 +190,14 @@
       ocrText.value = data.ocr_text || "";
       qs("#documentType").textContent = data.document_type || "unknown";
       qs("#documentConfidence").textContent = `${Math.round(confidence * 100)}%`;
+      qs("#ocrConfidence").textContent = `${Math.round(ocrConfidence * 100)}%`;
+      qs("#qualityScore").textContent = `${Math.round(qualityScore * 100)}%`;
+      qs("#boundaryConfidence").textContent = `${Math.round(boundaryConfidence * 100)}%`;
+      qs("#classificationMethod").textContent = classificationInfo.method || "fallback";
+      qs("#ocrLanguage").textContent = ocrInfo.ocr_language || "eng+vie";
       qs("#riskLevel").textContent = risk;
       qs("#riskLevel").className = `risk-text risk-${risk}`;
-      qs("#riskScore").textContent = data.fake_risk_score ?? 0;
+      qs("#riskScore").textContent = `${Math.round(riskScore * 100)}%`;
 
       riskReasons.innerHTML = "";
       const reasons = Array.isArray(data.fake_reasons) ? data.fake_reasons : [];
@@ -190,6 +206,18 @@
         item.textContent = reason;
         riskReasons.appendChild(item);
       });
+
+      qualityWarnings.innerHTML = "";
+      const warnings = Array.isArray(qualityInfo.quality_warnings) ? qualityInfo.quality_warnings : [];
+      (warnings.length ? warnings : ["Image quality is acceptable."]).forEach((warning) => {
+        const item = document.createElement("li");
+        item.textContent = warning;
+        qualityWarnings.appendChild(item);
+      });
+
+      if (data.manual_review_recommended || confidence < 0.55 || ocrConfidence < 0.55 || qualityScore < 0.55) {
+        setHidden(manualReviewWarning, false);
+      }
 
       setHidden(result, false);
       result.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -250,6 +278,7 @@
       const risk = score > 60 ? "High" : score > 25 ? "Medium" : "Low";
       const excerpt = data.matched_excerpt || "No excerpt available.";
       const title = data.matched_document?.title || "No reference match";
+      const matches = Array.isArray(data.matches) ? data.matches : [];
 
       qs("#similarityCircle").style.setProperty("--score", String(Math.max(0, Math.min(100, score))));
       qs("#similarityPercent").textContent = `${score.toFixed(1)}%`;
@@ -257,8 +286,33 @@
       qs("#plagiarismRisk").className = `risk-text risk-${risk.toLowerCase()}`;
       qs("#matchedTitle").textContent = title;
       qs("#matchedExcerpt").innerHTML = highlightExcerpt(excerpt, inputText);
+      renderMatches(matches, inputText);
 
       setHidden(result, false);
+    }
+
+    function renderMatches(matches, inputText) {
+      const list = qs("#matchesList");
+      if (!list) return;
+      list.innerHTML = "<h3>Top matched documents</h3>";
+      if (!matches.length) {
+        const empty = document.createElement("p");
+        empty.textContent = "No reference documents matched.";
+        list.appendChild(empty);
+        return;
+      }
+      matches.forEach((match, index) => {
+        const item = document.createElement("article");
+        item.className = "match-card";
+        item.innerHTML = `
+          <div>
+            <strong>${index + 1}. ${escapeHtml(match.title || "Untitled reference")}</strong>
+            <span>${Number(match.score || 0).toFixed(1)}%</span>
+          </div>
+          <p>${highlightExcerpt(match.excerpt || "No excerpt available.", inputText)}</p>
+        `;
+        list.appendChild(item);
+      });
     }
 
     function highlightExcerpt(excerpt, inputText) {
@@ -289,7 +343,8 @@
         qs("#detailOcr").value = card.dataset.ocr || "";
         qs("#detailType").textContent = card.dataset.type || "unknown";
         qs("#detailConfidence").textContent = card.dataset.confidence || "0%";
-        qs("#detailScore").textContent = card.dataset.score || "0";
+        const rawScore = Number(card.dataset.score || 0);
+        qs("#detailScore").textContent = rawScore <= 1 ? `${Math.round(rawScore * 100)}%` : String(rawScore);
         qs("#detailRisk").textContent = card.dataset.risk || "unknown";
         qs("#detailRisk").className = `risk-text risk-${normalizeRisk(card.dataset.risk)}`;
         qs("#detailPdf").href = card.dataset.pdf || "#";

@@ -12,8 +12,9 @@ class ScanJobAdmin(admin.ModelAdmin):
         "document_confidence",
         "fake_risk_level",
         "fake_risk_score",
+        "manual_review_recommended",
         "created_at",
     )
-    list_filter = ("status", "document_type", "fake_risk_level", "created_at")
+    list_filter = ("status", "document_type", "fake_risk_level", "manual_review_recommended", "created_at")
     search_fields = ("ocr_text", "error_message")
     readonly_fields = ("created_at", "updated_at")

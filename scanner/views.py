@@ -14,7 +14,11 @@ class ScanDocumentAPIView(APIView):
 
         job = ScanJob.objects.create(original_image=serializer.validated_data["image"])
         try:
-            process_scan_job(job)
+            process_scan_job(
+                job,
+                mode=serializer.validated_data.get("mode", "bw"),
+                lang=serializer.validated_data.get("lang", "eng+vie"),
+            )
         except Exception:
             job.refresh_from_db()
             data = ScanJobSerializer(job, context={"request": request}).data

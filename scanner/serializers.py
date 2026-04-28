@@ -5,6 +5,16 @@ from scanner.models import ScanJob
 
 class ScanJobCreateSerializer(serializers.Serializer):
     image = serializers.ImageField(write_only=True)
+    mode = serializers.ChoiceField(
+        choices=["bw", "gray", "color", "ocr"],
+        default="bw",
+        required=False,
+    )
+    lang = serializers.ChoiceField(
+        choices=["eng", "vie", "eng+vie"],
+        default="eng+vie",
+        required=False,
+    )
 
 
 class ScanJobSerializer(serializers.ModelSerializer):
@@ -23,9 +33,14 @@ class ScanJobSerializer(serializers.ModelSerializer):
             "ocr_text",
             "document_type",
             "document_confidence",
+            "classification_info",
             "fake_risk_score",
             "fake_risk_level",
             "fake_reasons",
+            "quality_info",
+            "boundary_info",
+            "ocr_info",
+            "manual_review_recommended",
             "error_message",
             "created_at",
             "updated_at",
