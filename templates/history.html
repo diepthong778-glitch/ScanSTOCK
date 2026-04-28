@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Scan History | SCANSTOCK{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">Archive</span>
+    <h1>Scan history</h1>
+    <p>Review scanned documents, OCR output, risk analysis, and exported PDFs.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'scanner-page' %}">New scan</a>
+</div>
+
+<section class="panel">
+  <div class="history-grid">
+    {% for scan in scans %}
+    <article class="history-card"
+      data-detail
+      data-original="{% if scan.original_image %}{{ scan.original_image.url }}{% endif %}"
+      data-scanned="{% if scan.scanned_image %}{{ scan.scanned_image.url }}{% endif %}"
+      data-pdf="{% if scan.pdf_file %}{{ scan.pdf_file.url }}{% endif %}"
+      data-ocr="{{ scan.ocr_text|escapejs }}"
+      data-type="{{ scan.document_type|default:'unknown' }}"
+      data-confidence="{% widthratio scan.document_confidence 1 100 %}%"
+      data-risk="{{ scan.fake_risk_level|default:'unknown' }}"
+      data-score="{{ scan.fake_risk_score|floatformat:1 }}"
+      data-reasons="{{ scan.fake_reasons|join:' | '|escapejs }}">
+      <div class="history-thumb">
+        {% if scan.scanned_image %}
+        <img src="{{ scan.scanned_image.url }}" alt="Scanned document thumbnail">
+        {% else %}
+        <span>No preview</span>
+        {% endif %}
+      </div>
+      <div class="history-meta">
+        <span class="badge {% if scan.document_type == 'unknown' or not scan.document_type %}badge-muted{% else %}badge-info{% endif %}">{{ scan.document_type|default:"unknown" }}</span>
+        <h2>Scan #{{ scan.id }}</h2>
+        <p>{{ scan.created_at|date:"M d, Y H:i" }}</p>
+      </div>
+      <div class="history-footer">
+        <span>{% widthratio scan.document_confidence 1 100 %}% confidence</span>
+        <span class="badge risk-{{ scan.fake_risk_level|default:'unknown' }}">{{ scan.fake_risk_level|default:"unknown" }}</span>
+      </div>
+      <div class="button-row">
+        <button class="btn btn-secondary" type="button" data-open-detail>View</button>
+        {% if scan.pdf_file %}<a class="btn btn-secondary" href="{{ scan.pdf_file.url }}" download>Download PDF</a>{% endif %}
+        <form method="post" action="{% url 'delete-scan-job' scan.id %}">
+          {% csrf_token %}
+          <button class="btn btn-danger" type="submit">Delete</button>
+        </form>
+      </div>
+    </article>
+    {% empty %}
+    <div class="empty-state tall">
+      <h2>No scan history yet</h2>
+      <p>Your scanned documents will appear here after using the scanner.</p>
+      <a class="btn btn-primary" href="{% url 'scanner-page' %}">Start scanning</a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="modal-backdrop hidden" id="scanDetailModal" aria-hidden="true">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="scanDetailTitle">
+    <div class="modal-header">
+      <div><span class="eyebrow">Scan detail</span><h2 id="scanDetailTitle">Document result</h2></div>
+      <button class="icon-button" data-close-modal type="button">Close</button>
+    </div>
+    <div class="detail-grid">
+      <div class="preview-card"><h3>Original image</h3><img id="detailOriginal" alt="Original document"></div>
+      <div class="preview-card"><h3>Scanned image</h3><img id="detailScanned" alt="Scanned document"></div>
+      <div class="panel detail-summary">
+        <div><span>Document type</span><strong id="detailType">unknown</strong></div>
+        <div><span>Confidence</span><strong id="detailConfidence">0%</strong></div>
+        <div><span>Fake risk score</span><strong id="detailScore">0</strong></div>
+        <div><span>Fake risk level</span><strong id="detailRisk">unknown</strong></div>
+        <h3>Risk reasons</h3>
+        <ul id="detailReasons"></ul>
+        <div class="button-row">
+          <a class="btn btn-secondary" id="detailPdf" href="#" download>Download PDF</a>
+          <button class="btn btn-primary" id="detailCopy" type="button">Copy text</button>
+          <button class="btn btn-secondary" type="button" data-placeholder="Re-run OCR will be added as a queued action later.">Re-run OCR</button>
+        </div>
+      </div>
+      <div class="panel ocr-panel"><h3>OCR text</h3><textarea id="detailOcr" rows="12" readonly></textarea></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

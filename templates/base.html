@@ -1,0 +1,68 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SCANSTOCK{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/scanstock.css' %}">
+</head>
+<body class="{% block body_class %}app-body{% endblock %}">
+  {% block layout %}
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand-mark" href="{% url 'dashboard' %}" aria-label="SCANSTOCK dashboard">
+        <span class="brand-icon">S</span>
+        <span>
+          <strong>SCANSTOCK</strong>
+          <small>Document intelligence</small>
+        </span>
+      </a>
+      <nav class="sidebar-nav" aria-label="Primary">
+        <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><span>Dashboard</span></a>
+        <a href="{% url 'scanner-page' %}" class="{% if request.resolver_match.url_name == 'scanner-page' %}active{% endif %}"><span>Document Scanner</span></a>
+        <a href="{% url 'plagiarism-page' %}" class="{% if request.resolver_match.url_name == 'plagiarism-page' %}active{% endif %}"><span>Plagiarism Checker</span></a>
+        <a href="{% url 'history' %}" class="{% if request.resolver_match.url_name == 'history' %}active{% endif %}"><span>Scan History</span></a>
+        <a href="{% url 'reference-documents' %}" class="{% if request.resolver_match.url_name == 'reference-documents' %}active{% endif %}"><span>Reference Documents</span></a>
+        <a href="#settings" data-placeholder="Settings are planned for a later release."><span>Settings</span></a>
+      </nav>
+      <div class="sidebar-card">
+        <span class="mini-label">AI-assisted</span>
+        <p>Risk analysis is an estimate with transparent indicators.</p>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" data-menu-toggle aria-label="Open menu">Menu</button>
+        <div class="search-box">
+          <span>Search</span>
+          <input type="search" placeholder="Search scans, documents, results">
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-button" data-theme-toggle aria-label="Toggle theme">Theme</button>
+          <button class="icon-button" aria-label="Notifications">Alerts</button>
+          <div class="avatar" aria-label="User avatar">AI</div>
+        </div>
+      </header>
+
+      {% if messages %}
+      <div class="message-stack">
+        {% for message in messages %}
+        <div class="toast {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <section class="page-content">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+  </div>
+  {% endblock %}
+  <script src="{% static 'js/scanstock.js' %}"></script>
+</body>
+</html>

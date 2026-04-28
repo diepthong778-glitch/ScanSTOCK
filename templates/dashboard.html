@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | SCANSTOCK{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">Control center</span>
+    <h1>Document intelligence dashboard</h1>
+    <p>Monitor scan volume, recognition quality, risk indicators, and similarity checks.</p>
+  </div>
+  <div class="page-actions">
+    <a class="btn btn-primary" href="{% url 'scanner-page' %}">Upload document</a>
+    <a class="btn btn-secondary" href="{% url 'plagiarism-page' %}">Check text</a>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <article class="stat-card"><span>Total scans</span><strong>{{ stats.total_scans }}</strong><small>All uploaded documents</small></article>
+  <article class="stat-card"><span>Recognized documents</span><strong>{{ stats.recognized_documents }}</strong><small>AI or rule classified</small></article>
+  <article class="stat-card danger"><span>High risk documents</span><strong>{{ stats.high_risk_documents }}</strong><small>Needs human review</small></article>
+  <article class="stat-card"><span>Plagiarism checks</span><strong>{{ stats.plagiarism_checks }}</strong><small>Similarity reports</small></article>
+</div>
+
+<div class="dashboard-grid">
+  <section class="panel panel-large">
+    <div class="panel-header">
+      <div><h2>Recent scans</h2><p>Latest document recognition jobs.</p></div>
+      <a href="{% url 'history' %}">View all</a>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Document</th><th>Type</th><th>Confidence</th><th>Risk</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for scan in recent_scans %}
+          <tr>
+            <td><div class="doc-cell">{% if scan.scanned_image %}<img src="{{ scan.scanned_image.url }}" alt="scan thumbnail">{% else %}<span class="thumb-empty"></span>{% endif %}<span>#{{ scan.id }}</span></div></td>
+            <td>{{ scan.document_type|default:"unknown" }}</td>
+            <td>{% widthratio scan.document_confidence 1 100 %}%</td>
+            <td><span class="badge risk-{{ scan.fake_risk_level|default:'unknown' }}">{{ scan.fake_risk_level|default:"unknown" }}</span></td>
+            <td>{{ scan.created_at|date:"M d, Y H:i" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5"><div class="empty-state">No scan jobs yet. Upload a document to begin.</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header"><div><h2>Quick actions</h2><p>Common workflows.</p></div></div>
+    <div class="quick-actions">
+      <a href="{% url 'scanner-page' %}">Upload document<span>Scan image or camera capture</span></a>
+      <a href="{% url 'scanner-page' %}">Open camera<span>Mobile capture ready</span></a>
+      <a href="{% url 'plagiarism-page' %}">Check text<span>Run similarity analysis</span></a>
+      <a href="{% url 'history' %}">Export report<span>Download scan PDFs</span></a>
+    </div>
+  </section>
+
+  <section class="panel panel-large">
+    <div class="panel-header">
+      <div><h2>Recent plagiarism checks</h2><p>Latest similarity analysis results.</p></div>
+      <a href="{% url 'plagiarism-page' %}">New check</a>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Score</th><th>Matched document</th><th>Excerpt</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for check in recent_checks %}
+          <tr>
+            <td><span class="badge {% if check.similarity_percent > 60 %}risk-high{% elif check.similarity_percent > 25 %}risk-medium{% else %}risk-low{% endif %}">{{ check.similarity_percent|floatformat:1 }}%</span></td>
+            <td>{{ check.matched_document.title|default:"No reference match" }}</td>
+            <td>{{ check.matched_excerpt|truncatechars:90|default:"No excerpt available" }}</td>
+            <td>{{ check.created_at|date:"M d, Y H:i" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4"><div class="empty-state">No plagiarism checks yet.</div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

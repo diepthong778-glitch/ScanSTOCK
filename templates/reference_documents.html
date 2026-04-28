@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Reference Documents | SCANSTOCK{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">Knowledge base</span>
+    <h1>Reference documents</h1>
+    <p>Add and manage the source documents used by the plagiarism checker.</p>
+  </div>
+</div>
+
+<div class="reference-layout">
+  <section class="panel">
+    <div class="panel-header"><div><h2>Add reference</h2><p>Store trusted source text for future similarity checks.</p></div></div>
+    <form method="post" class="reference-form">
+      {% csrf_token %}
+      <label>Title<input name="title" type="text" placeholder="Document title" required></label>
+      <label>Source<input name="source" type="text" placeholder="URL, course, department, or owner"></label>
+      <label>Content<textarea name="content" rows="12" placeholder="Paste reference content..." required></textarea></label>
+      <button class="btn btn-primary btn-full" type="submit">Add reference document</button>
+    </form>
+  </section>
+
+  <section class="panel reference-list-panel">
+    <div class="panel-header">
+      <div><h2>Reference library</h2><p>{{ documents|length }} document{{ documents|length|pluralize }} available.</p></div>
+      <form class="inline-search" method="get">
+        <input type="search" name="q" value="{{ query }}" placeholder="Search references">
+        <button class="btn btn-secondary" type="submit">Search</button>
+      </form>
+    </div>
+    <div class="reference-list">
+      {% for document in documents %}
+      <article class="reference-card">
+        <div>
+          <span class="badge badge-info">{{ document.source|default:"internal" }}</span>
+          <h3>{{ document.title }}</h3>
+          <p>{{ document.content|truncatechars:220 }}</p>
+          <small>Added {{ document.created_at|date:"M d, Y H:i" }}</small>
+        </div>
+        <div class="button-row">
+          <button class="btn btn-secondary" type="button" data-reference-view data-title="{{ document.title|escapejs }}" data-content="{{ document.content|escapejs }}">View</button>
+          <form method="post" action="{% url 'delete-reference-document' document.id %}">
+            {% csrf_token %}
+            <button class="btn btn-danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </article>
+      {% empty %}
+      <div class="empty-state tall">
+        <h2>No references found</h2>
+        <p>Add reference documents so the plagiarism checker has sources to compare against.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+
+<div class="modal-backdrop hidden" id="referenceModal" aria-hidden="true">
+  <div class="modal-panel narrow" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h2 id="referenceModalTitle">Reference document</h2>
+      <button class="icon-button" type="button" data-close-reference>Close</button>
+    </div>
+    <textarea id="referenceModalContent" rows="18" readonly></textarea>
+  </div>
+</div>
+{% endblock %}

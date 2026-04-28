@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Plagiarism Checker | SCANSTOCK{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">Similarity Analysis</span>
+    <h1>Professional plagiarism checker.</h1>
+    <p>Compare submitted text against reference documents with fuzzy matching and TF-IDF similarity.</p>
+  </div>
+  <a class="btn btn-secondary" href="{% url 'reference-documents' %}">Manage references</a>
+</div>
+
+<div class="plagiarism-layout">
+  <section class="panel text-check-panel">
+    <div class="panel-header"><div><h2>Input text</h2><p>Paste the text you want to analyze.</p></div></div>
+    <form id="plagiarismForm">
+      {% csrf_token %}
+      <textarea id="plagiarismText" name="text" rows="16" placeholder="Paste contract, essay, report, or OCR text here..."></textarea>
+      <div class="button-row spread">
+        <button class="btn btn-secondary" type="button" data-placeholder="File upload support is reserved for a later version.">Upload file</button>
+        <button class="btn btn-primary" type="submit">Check plagiarism</button>
+      </div>
+    </form>
+  </section>
+
+  <aside class="panel result-panel">
+    <div id="plagiarismEmpty" class="empty-state tall">
+      <h2>No result yet</h2>
+      <p>Run a check to see similarity score, matched document, risk level, and highlighted excerpt.</p>
+    </div>
+
+    <div id="plagiarismLoading" class="loading-panel compact hidden">
+      <h2>Checking similarity</h2>
+      <div class="loading-steps"><span>Preparing text</span><span>Fuzzy matching</span><span>TF-IDF scoring</span><span>Saving report</span></div>
+    </div>
+
+    <div id="plagiarismResult" class="hidden">
+      <div class="circle-score" id="similarityCircle" style="--score:0">
+        <strong id="similarityPercent">0%</strong>
+        <span>Similarity score</span>
+      </div>
+      <div class="result-stack">
+        <div><span>Risk level</span><strong id="plagiarismRisk">Low</strong></div>
+        <div><span>Matched document</span><strong id="matchedTitle">No reference match</strong></div>
+      </div>
+      <div class="excerpt-box">
+        <h3>Matched excerpt</h3>
+        <p id="matchedExcerpt">No excerpt available.</p>
+      </div>
+      <small class="safe-note">Similarity score indicates overlap with references. It does not prove intent.</small>
+    </div>
+
+    <div id="plagiarismError" class="error-panel hidden"></div>
+  </aside>
+</div>
+{% endblock %}

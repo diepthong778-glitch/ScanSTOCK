@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}SCANSTOCK | AI Document Intelligence{% endblock %}
+{% block body_class %}landing-body{% endblock %}
+{% block layout %}
+<div class="landing-shell">
+  <nav class="landing-nav">
+    <a class="brand-mark" href="{% url 'landing' %}">
+      <span class="brand-icon">S</span>
+      <span><strong>SCANSTOCK</strong><small>AI document intelligence</small></span>
+    </a>
+    <div class="landing-links">
+      <a href="#features">Features</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#trust">Trust</a>
+      <button class="icon-button" data-theme-toggle>Theme</button>
+      <a class="btn btn-primary" href="{% url 'dashboard' %}">Open App</a>
+    </div>
+  </nav>
+
+  <section class="hero-section">
+    <div class="hero-media" aria-hidden="true">
+      <div class="scanner-mockup">
+        <div class="mockup-header">
+          <span></span><span></span><span></span>
+          <strong>Live scan</strong>
+        </div>
+        <div class="mock-upload">
+          <div class="paper-shape">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="scan-line"></div>
+        </div>
+        <div class="mock-grid">
+          <div>
+            <small>OCR preview</small>
+            <p>Invoice tax code, total amount, VAT extracted with confidence.</p>
+          </div>
+          <div class="badge badge-info">Invoice</div>
+          <div class="badge badge-success">Low risk</div>
+          <div class="score-chip">94% confidence</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-copy">
+      <span class="eyebrow">Modern AI productivity for documents</span>
+      <h1>SCANSTOCK</h1>
+      <p>AI-powered document scanner, recognition engine, OCR text extraction, plagiarism checker, and risk analysis in one clean workspace.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg" href="{% url 'scanner-page' %}">Start Scanning</a>
+        <a class="btn btn-ghost btn-lg" href="{% url 'plagiarism-page' %}">Check Plagiarism</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-band" id="features">
+    <div class="section-heading">
+      <span class="eyebrow">Capabilities</span>
+      <h2>Everything a serious document workflow needs.</h2>
+    </div>
+    <div class="feature-grid">
+      <article class="feature-card"><span>01</span><h3>Smart Document Scanner</h3><p>Detects paper boundaries, crops perspective, and produces a clean scan-like result.</p></article>
+      <article class="feature-card"><span>02</span><h3>AI Document Recognition</h3><p>Classifies CCCD, invoice, contract, resume, medical document, or unknown.</p></article>
+      <article class="feature-card"><span>03</span><h3>OCR Text Extraction</h3><p>Extracts searchable text from scanned images with English and Vietnamese support.</p></article>
+      <article class="feature-card"><span>04</span><h3>Plagiarism Checking</h3><p>Combines fuzzy matching and TF-IDF similarity against your reference database.</p></article>
+      <article class="feature-card"><span>05</span><h3>Fake Document Risk Score</h3><p>Surfaces suspicious indicators as low, medium, or high risk without absolute claims.</p></article>
+      <article class="feature-card"><span>06</span><h3>PDF Export</h3><p>Exports scanned documents as high-quality JPG and ready-to-share PDF files.</p></article>
+    </div>
+  </section>
+
+  <section class="workflow-section" id="workflow">
+    <div class="section-heading">
+      <span class="eyebrow">Workflow</span>
+      <h2>From camera capture to structured intelligence.</h2>
+    </div>
+    <div class="timeline">
+      <div><b>Step 1</b><span>Upload or capture document</span></div>
+      <div><b>Step 2</b><span>Auto scan and enhance</span></div>
+      <div><b>Step 3</b><span>Extract text with OCR</span></div>
+      <div><b>Step 4</b><span>Recognize document type</span></div>
+      <div><b>Step 5</b><span>Check risk or plagiarism</span></div>
+    </div>
+  </section>
+
+  <section class="trust-section" id="trust">
+    <div>
+      <span class="eyebrow">Trust model</span>
+      <h2>Clear signals, careful wording.</h2>
+      <p>SCANSTOCK keeps results transparent: local file handling through your Django media storage, explainable risk indicators, and AI-assisted estimates that never claim forensic certainty.</p>
+    </div>
+    <div class="trust-panel">
+      <p><strong>Risk Analysis</strong></p>
+      <p>Low, medium, or high risk based on OCR quality, expected fields, image quality, and suspicious wording.</p>
+      <small>This result is only an AI-assisted estimate.</small>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <h2>Turn raw scans into useful document intelligence.</h2>
+    <p>Start with scanning, extract OCR, recognize document type, export PDF, and check similarity from one polished dashboard.</p>
+    <a class="btn btn-primary btn-lg" href="{% url 'dashboard' %}">Enter SCANSTOCK</a>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Document Scanner | SCANSTOCK{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <span class="eyebrow">Document Recognition</span>
+    <h1>Scan, OCR, classify, and analyze risk.</h1>
+    <p>Upload from desktop or capture with a mobile camera. SCANSTOCK enhances the scan and returns explainable AI-assisted results.</p>
+  </div>
+</div>
+
+<form class="scanner-workspace" id="scannerForm">
+  {% csrf_token %}
+  <section class="upload-panel">
+    <div class="dropzone" id="dropzone">
+      <input id="documentInput" name="image" type="file" accept="image/*" capture="environment">
+      <div class="dropzone-content">
+        <span class="upload-orbit"></span>
+        <h2>Drop a document image here</h2>
+        <p>or capture from your mobile camera</p>
+        <div class="button-row">
+          <label class="btn btn-primary" for="documentInput">Upload from device</label>
+          <label class="btn btn-secondary" for="documentInput">Open camera</label>
+        </div>
+        <small>JPG, PNG, or camera capture. Large touch targets are enabled on mobile.</small>
+      </div>
+    </div>
+
+    <div class="scanner-controls">
+      <label>
+        Scan mode
+        <select name="mode" id="scanMode">
+          <option value="bw">Black & white scan</option>
+          <option value="gray">Gray scan</option>
+          <option value="color">Color scan</option>
+        </select>
+      </label>
+      <label>
+        OCR language
+        <select name="lang" id="ocrLang">
+          <option value="eng">English</option>
+          <option value="vie">Vietnamese</option>
+          <option value="eng+vie" selected>English + Vietnamese</option>
+        </select>
+      </label>
+      <button class="btn btn-primary btn-full" type="submit">Run AI scan</button>
+    </div>
+  </section>
+
+  <section class="loading-panel hidden" id="scanLoading" aria-live="polite">
+    <h2>Scanning in progress</h2>
+    <div class="loading-steps">
+      <span>Uploading</span>
+      <span>Detecting paper</span>
+      <span>Enhancing image</span>
+      <span>Running OCR</span>
+      <span>Classifying document</span>
+      <span>Calculating risk</span>
+    </div>
+  </section>
+
+  <section class="error-panel hidden" id="scanError"></section>
+
+  <section class="result-grid hidden" id="scanResult">
+    <div class="preview-card">
+      <div class="panel-header"><div><h2>Original image</h2><p>Uploaded source file.</p></div></div>
+      <img id="originalPreview" alt="Original document preview">
+    </div>
+    <div class="preview-card">
+      <div class="panel-header"><div><h2>Scanned result</h2><p>Enhanced scan output.</p></div></div>
+      <img id="scannedPreview" alt="Scanned document preview">
+    </div>
+
+    <div class="panel result-summary">
+      <div class="metric-card"><span>Document type</span><strong id="documentType">Unknown</strong></div>
+      <div class="metric-card"><span>Confidence</span><strong id="documentConfidence">0%</strong></div>
+      <div class="metric-card"><span>Risk level</span><strong id="riskLevel">Unknown</strong></div>
+      <div class="metric-card"><span>Risk score</span><strong id="riskScore">0</strong></div>
+      <div class="risk-reasons">
+        <h3>Suspicious indicators</h3>
+        <ul id="riskReasons"></ul>
+        <p>This result is only an AI-assisted estimate.</p>
+      </div>
+    </div>
+
+    <div class="panel ocr-panel">
+      <div class="panel-header"><div><h2>OCR text</h2><p>Review, edit, or copy extracted text.</p></div></div>
+      <textarea id="ocrText" rows="12" readonly></textarea>
+      <div class="button-row">
+        <a class="btn btn-secondary" id="downloadJpg" href="#" download>Download scanned JPG</a>
+        <a class="btn btn-secondary" id="downloadPdf" href="#" download>Download PDF</a>
+        <button class="btn btn-primary" id="copyOcr" type="button">Copy OCR text</button>
+      </div>
+    </div>
+  </section>
+</form>
+{% endblock %}
