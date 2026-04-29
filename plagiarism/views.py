@@ -1,42 +1,36 @@
-from rest_framework import status
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import status
 
-from services.plagiarism_service import check_text_similarity
-from plagiarism.serializers import (
-    PlagiarismCheckCreateSerializer,
-    PlagiarismCheckSerializer,
-)
-from plagiarism.services import check_plagiarism
+from .models import PlagiarismCheck
+from .services import check_plagiarism
 
 
-class PlagiarismCheckAPIView(APIView):
-    def post(self, request):
-        serializer = PlagiarismCheckCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        text = serializer.validated_data["text"]
-        sources = request.data.get("sources")
-        if sources is not None:
-            if not isinstance(sources, list) or not all(isinstance(item, str) for item in sources):
-                return Response(
-                    {
-                        "success": False,
-                        "message": "Field 'sources' must be a list of text strings.",
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            result = check_text_similarity(text, sources=sources)
-            return Response(result, status=status.HTTP_200_OK)
+@api_view(["POST"])
+def check_plagiarism_api(request):
+    input_text = request.data.get("text", "").strip()
 
-        offline_result = check_text_similarity(text, sources=None)
-        check = check_plagiarism(text)
-        data = PlagiarismCheckSerializer(check).data
-        data.update(
-            {
-                "success": True,
-                "overallScore": round(data["similarity_percent"] / 100, 3),
-                "riskLevel": data["risk_level"],
-                "notes": offline_result["notes"],
-            }
+    if not input_text:
+        return Response(
+            {"error": "Vui lòng nhập nội dung cần check."},
+            status=status.HTTP_400_BAD_REQUEST
         )
-        return Response(data, status=status.HTTP_201_CREATED)
+
+    result = check_plagiarism(input_text)
+
+    matched_doc = result["matched_document"]
+
+    check = PlagiarismCheck.objects.create(
+        input_text=input_text,
+        similarity_percent=result["similarity_percent"],
+        matched_document=matched_doc,
+        matched_excerpt=result["matched_excerpt"]
+    )
+
+    return Response({
+        "message": "Check đạo văn thành công.",
+        "check_id": check.id,
+        "similarity_percent": check.similarity_percent,
+        "matched_document": matched_doc.title if matched_doc else None,
+        "matched_excerpt": check.matched_excerpt
+    })

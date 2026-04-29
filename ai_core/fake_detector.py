@@ -1,113 +1,116 @@
-from __future__ import annotations
-
-from typing import Any
-import unicodedata
-
-
-EXPECTED_FIELDS = {
-    "cccd_id_card": ["ngay sinh", "quoc tich", "noi thuong tru", "so dinh danh"],
-    "invoice": ["tong tien", "ma so thue", "vat", "hoa don"],
-    "contract": ["ben a", "ben b", "dieu khoan", "chu ky"],
-    "resume": ["experience", "education", "skills"],
-    "medical_document": ["chan doan", "bac si", "don thuoc", "benh vien"],
-    "bank_statement": ["account", "transaction", "balance"],
-    "school_document": ["student", "grade", "school"],
-    "receipt": ["total", "paid", "receipt"],
-}
+from pathlib import Path
+from PIL import Image, ExifTags
+import cv2
+import numpy as np
 
 
-def assess_fake_document_risk(
-    *,
-    ocr_text: str,
-    document_type: str,
-    quality_info: dict[str, Any],
-    boundary_info: dict[str, Any],
-    ocr_info: dict[str, Any],
-    classification_info: dict[str, Any],
-) -> dict[str, Any]:
-    score = 0.0
-    reasons: list[str] = []
+def check_image_quality(image_path):
+    image = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
 
-    text = _normalize_text(ocr_text)
-    quality_score = float(quality_info.get("quality_score", 0.0))
-    boundary_confidence = float(boundary_info.get("boundary_confidence", 0.0))
-    ocr_confidence = float(ocr_info.get("ocr_confidence", 0.0))
-    classification_confidence = float(classification_info.get("confidence", 0.0))
+    if image is None:
+        return 0.4, ["Không đọc được ảnh để kiểm tra chất lượng."]
 
-    if quality_score < 0.45:
-        score += 0.18
-        reasons.append("Image quality is poor; manual review is recommended.")
-    elif quality_score < 0.65:
-        score += 0.08
-        reasons.append("Image quality is fair and may reduce OCR reliability.")
+    reasons = []
+    risk = 0.0
 
-    if quality_info.get("blur_score", 0) < 80:
-        score += 0.14
-        reasons.append("Image appears blurry.")
+    blur_score = cv2.Laplacian(image, cv2.CV_64F).var()
 
-    if quality_info.get("resolution_score", 0) < 0.5:
-        score += 0.12
-        reasons.append("Image resolution is low for reliable verification.")
+    if blur_score < 80:
+        risk += 0.2
+        reasons.append("Ảnh bị mờ, khó xác thực thông tin.")
 
-    if quality_info.get("compression_warning"):
-        score += 0.08
-        reasons.append("Image appears heavily compressed.")
+    height, width = image.shape[:2]
+    if width < 800 or height < 600:
+        risk += 0.2
+        reasons.append("Độ phân giải ảnh thấp.")
 
-    if quality_info.get("shadow_warning"):
-        score += 0.08
-        reasons.append("Uneven lighting or shadow was detected.")
+    return min(risk, 1.0), reasons
 
-    if boundary_confidence < 0.45:
-        score += 0.14
-        reasons.append("Paper boundary confidence is low.")
 
-    if ocr_confidence < 0.45:
-        score += 0.16
-        reasons.append("OCR confidence is low.")
+def check_metadata(image_path):
+    reasons = []
+    risk = 0.0
 
-    if len(text) < 40:
-        score += 0.12
-        reasons.append("OCR extracted very little readable text.")
+    try:
+        image = Image.open(image_path)
+        exif = image.getexif()
 
-    if classification_confidence < 0.55 or document_type == "unknown":
-        score += 0.12
-        reasons.append("Document type confidence is low.")
+        if not exif:
+            risk += 0.15
+            reasons.append("Ảnh không có EXIF metadata. Có thể là ảnh đã qua chỉnh sửa hoặc tải lại.")
 
-    expected = EXPECTED_FIELDS.get(document_type, [])
-    if expected:
-        missing = [field for field in expected if field not in text]
-        if len(missing) >= max(1, len(expected) - 1):
-            score += 0.12
-            reasons.append("Several expected fields for this document type were not found.")
+    except Exception:
+        risk += 0.1
+        reasons.append("Không đọc được metadata ảnh.")
 
-    suspicious_terms = ["copy", "sample", "specimen", "void", "fake", "for test"]
-    if any(term in text for term in suspicious_terms):
-        score += 0.18
-        reasons.append("OCR found wording commonly used on samples or non-final documents.")
+    return min(risk, 1.0), reasons
 
-    score = round(min(score, 0.95), 2)
-    if score >= 0.60:
+
+def check_required_fields(document_type, text):
+    normalized = text.lower()
+    reasons = []
+    risk = 0.0
+
+    required_map = {
+        "Căn cước công dân": [
+            "căn cước",
+            "số định danh",
+            "ngày sinh",
+            "quốc tịch",
+            "quê quán"
+        ],
+        "Hóa đơn": [
+            "hóa đơn",
+            "tổng tiền",
+            "mã số thuế"
+        ],
+        "Hợp đồng": [
+            "hợp đồng",
+            "bên a",
+            "bên b",
+            "điều khoản"
+        ]
+    }
+
+    required_fields = required_map.get(document_type, [])
+
+    if not required_fields:
+        return 0.1, ["Chưa có mẫu kiểm tra riêng cho loại giấy tờ này."]
+
+    missing = [field for field in required_fields if field not in normalized]
+
+    if missing:
+        risk += min(0.5, len(missing) * 0.15)
+        reasons.append(f"Thiếu trường quan trọng: {', '.join(missing)}")
+
+    return min(risk, 1.0), reasons
+
+
+def fake_document_risk(image_path, document_type, ocr_text):
+    total_risk = 0.0
+    all_reasons = []
+
+    checks = [
+        check_image_quality(image_path),
+        check_metadata(image_path),
+        check_required_fields(document_type, ocr_text),
+    ]
+
+    for risk, reasons in checks:
+        total_risk += risk
+        all_reasons.extend(reasons)
+
+    total_risk = min(total_risk, 1.0)
+
+    if total_risk >= 0.65:
         level = "high"
-    elif score >= 0.30:
+    elif total_risk >= 0.35:
         level = "medium"
     else:
         level = "low"
 
-    if not reasons:
-        reasons.append("No strong suspicious indicators were detected.")
-
-    if score >= 0.30:
-        reasons.append("Manual review is recommended for important documents.")
-
     return {
-        "score": score,
-        "level": level,
-        "reasons": reasons,
-        "disclaimer": "This is AI-assisted risk analysis, not legal verification.",
+        "risk_score": round(total_risk, 2),
+        "risk_level": level,
+        "reasons": all_reasons
     }
-
-
-def _normalize_text(text: str) -> str:
-    decomposed = unicodedata.normalize("NFD", text or "")
-    ascii_text = "".join(ch for ch in decomposed if unicodedata.category(ch) != "Mn")
-    return " ".join(ascii_text.lower().split())

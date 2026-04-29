@@ -35,3 +35,77 @@ Not Found: /favicon.ico
 [29/Apr/2026 00:20:32] "GET /history/ HTTP/1.1" 200 10501
 [29/Apr/2026 00:20:58] "GET /reference-documents/ HTTP/1.1" 200 4476
 [29/Apr/2026 00:21:01] "GET /plagiarism/ HTTP/1.1" 200 4818
+C:\Project\ScanSTOCK\scanner\models.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Project\ScanSTOCK\ai_core\fake_detector.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Project\ScanSTOCK\plagiarism\services.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Project\ScanSTOCK\plagiarism\serializers.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Project\ScanSTOCK\ai_core\fake_detector.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Project\ScanSTOCK\scanner\services.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Project\ScanSTOCK\scanner\services.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Project\ScanSTOCK\ai_core\classifier.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Project\ScanSTOCK\scanner\admin.py changed, reloading.
+Watching for file changes with StatReloader
+[29/Apr/2026 01:02:16] "GET /scanner/ HTTP/1.1" 200 7637
+[29/Apr/2026 01:02:16,548] - Broken pipe from ('127.0.0.1', 49497)
+[29/Apr/2026 01:02:16] "GET /static/img/scanstock-logo.svg HTTP/1.1" 200 1922
+[29/Apr/2026 01:02:16,667] - Broken pipe from ('127.0.0.1', 49498)
+[29/Apr/2026 01:06:32] "GET / HTTP/1.1" 200 5688
+[29/Apr/2026 01:06:33] "GET /static/img/scanstock-logo.svg HTTP/1.1" 200 1922
+[29/Apr/2026 01:06:33] "GET /static/img/scanstock-icon.png HTTP/1.1" 200 19170
+[29/Apr/2026 01:06:33] "GET /static/css/scanstock.css HTTP/1.1" 200 23238
+[29/Apr/2026 01:06:33] "GET /static/js/scanstock.js HTTP/1.1" 200 15383
+[29/Apr/2026 01:06:33] "GET /static/img/favicon.ico HTTP/1.1" 200 40688
+[29/Apr/2026 01:06:44] "GET /scanner/ HTTP/1.1" 200 7637
+[29/Apr/2026 01:06:45] "GET /plagiarism/ HTTP/1.1" 200 5053
+[29/Apr/2026 01:06:46] "GET /history/ HTTP/1.1" 200 10680
+[29/Apr/2026 01:06:46] "GET /media/scanner/results/scan_3.jpg HTTP/1.1" 200 186864
+[29/Apr/2026 01:06:46] "GET /media/scanner/results/scan_2.jpg HTTP/1.1" 200 275642
+[29/Apr/2026 01:06:47] "GET /reference-documents/ HTTP/1.1" 200 4655
+[29/Apr/2026 01:06:47] "GET /history/ HTTP/1.1" 200 10680
+[29/Apr/2026 01:06:52] "GET /scanner/ HTTP/1.1" 200 7637
+[29/Apr/2026 01:06:55] "GET /plagiarism/ HTTP/1.1" 200 5053
+[29/Apr/2026 01:07:06] "GET /scanner/ HTTP/1.1" 200 7637
+[29/Apr/2026 01:07:06] "GET /static/js/scanstock.js HTTP/1.1" 304 0
+[29/Apr/2026 01:07:07] "GET /dashboard/ HTTP/1.1" 200 5911
+[29/Apr/2026 01:09:31] "GET / HTTP/1.1" 200 5688
+[29/Apr/2026 01:09:32] "GET /static/css/scanstock.css HTTP/1.1" 304 0
+[29/Apr/2026 01:09:32] "GET /static/img/scanstock-logo.svg HTTP/1.1" 304 0
+[29/Apr/2026 01:09:32] "GET /static/img/scanstock-icon.png HTTP/1.1" 304 0
+[29/Apr/2026 01:09:32] "GET /static/js/scanstock.js HTTP/1.1" 304 0
+[29/Apr/2026 01:09:34] "GET /scanner/ HTTP/1.1" 200 7637
+[29/Apr/2026 01:09:35] "GET /history/ HTTP/1.1" 200 10680
+[29/Apr/2026 01:09:35] "GET /media/scanner/results/scan_3.jpg HTTP/1.1" 304 0
+[29/Apr/2026 01:09:35] "GET /media/scanner/results/scan_2.jpg HTTP/1.1" 304 0
+[29/Apr/2026 01:09:35] "GET /plagiarism/ HTTP/1.1" 200 5053
+[29/Apr/2026 01:09:38] "GET /scanner/ HTTP/1.1" 200 7637
+[29/Apr/2026 01:09:58] "POST /api/scanner/scan/ HTTP/1.1" 201 4085
+[29/Apr/2026 01:09:59] "GET /media/scanner/results/scan_6.jpg HTTP/1.1" 200 173721
+C:\Project\ScanSTOCK\scanstock\urls.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Project\ScanSTOCK\plagiarism\views.py changed, reloading.
+Watching for file changes with StatReloader
+C:\Project\ScanSTOCK\scanstock\settings.py changed, reloading.
+Watching for file changes with StatReloader
+[29/Apr/2026 01:25:34] "GET / HTTP/1.1" 200 5688
+[29/Apr/2026 01:25:34] "GET /static/img/scanstock-logo.svg HTTP/1.1" 304 0
+[29/Apr/2026 01:25:34] "GET /static/css/scanstock.css HTTP/1.1" 304 0
+[29/Apr/2026 01:25:34] "GET /static/img/scanstock-icon.png HTTP/1.1" 304 0
+[29/Apr/2026 01:25:34] "GET /static/js/scanstock.js HTTP/1.1" 304 0
+[29/Apr/2026 01:25:37] "GET /scanner/ HTTP/1.1" 200 7637
+[29/Apr/2026 01:25:39] "GET /plagiarism/ HTTP/1.1" 200 5053
+[29/Apr/2026 01:25:41] "GET /history/ HTTP/1.1" 200 13732
+[29/Apr/2026 01:25:41] "GET /media/scanner/results/scan_6.jpg HTTP/1.1" 304 0
+[29/Apr/2026 01:25:41] "GET /media/scanner/results/scan_3.jpg HTTP/1.1" 304 0
+[29/Apr/2026 01:25:41] "GET /media/scanner/results/scan_2.jpg HTTP/1.1" 304 0
+[29/Apr/2026 01:25:48] "GET /plagiarism/ HTTP/1.1" 200 5053
+[29/Apr/2026 01:25:48] "GET /scanner/ HTTP/1.1" 200 7637
+[29/Apr/2026 01:26:03] "POST /api/scanner/scan/ HTTP/1.1" 201 4085
+[29/Apr/2026 01:26:03] "GET /media/scanner/results/scan_7.jpg HTTP/1.1" 200 173721

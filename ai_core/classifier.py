@@ -174,6 +174,18 @@ def classify_document(text: str) -> ClassificationResult:
     return ai_result
 
 
+def ai_classify(text: str) -> dict:
+    """Backward-compatible wrapper used by the scanner API."""
+    result = classify_document(text)
+    return {
+        "label": result.document_type,
+        "display_label": result.document_label,
+        "confidence": result.confidence,
+        "method": result.method,
+        "matched_signals": result.matched_signals,
+    }
+
+
 def rule_based_classify(text: str) -> ClassificationResult:
     normalized = _normalize(text)
     best_label = "unknown"

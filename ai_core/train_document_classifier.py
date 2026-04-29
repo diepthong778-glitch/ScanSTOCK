@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-import sys
 from pathlib import Path
 
 import joblib
@@ -12,17 +10,9 @@ from sklearn.pipeline import Pipeline
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scanstock.settings")
-
-import django  # noqa: E402
-
-django.setup()
-
-from django.conf import settings  # noqa: E402
-
+DATASET_PATH = BASE_DIR / "datasets" / "document_training.csv"
+MODEL_DIR = BASE_DIR / "models_ai"
+MODEL_PATH = MODEL_DIR / "document_classifier.joblib"
 
 REQUIRED_COLUMNS = {"text", "label"}
 ALLOWED_LABELS = {
@@ -39,18 +29,15 @@ ALLOWED_LABELS = {
 
 
 def train() -> Path:
-    dataset_path = Path(settings.DATASETS_DIR) / "document_training.csv"
-    output_path = Path(settings.AI_MODEL_DIR) / "document_classifier.joblib"
+    if not DATASET_PATH.exists():
+        raise FileNotFoundError(f"Training dataset not found: {DATASET_PATH}")
 
-    if not dataset_path.exists():
-        raise FileNotFoundError(f"Training dataset not found: {dataset_path}")
-
-    df = pd.read_csv(dataset_path)
+    df = pd.read_csv(DATASET_PATH)
     missing_columns = REQUIRED_COLUMNS - set(df.columns)
     if missing_columns:
         raise ValueError(f"Dataset is missing required columns: {sorted(missing_columns)}")
 
-    df = df.dropna(subset=["text", "label"])
+    df = df.dropna(subset=["text", "label"]).copy()
     df["text"] = df["text"].astype(str).str.strip()
     df["label"] = df["label"].astype(str).str.strip()
     df = df[(df["text"] != "") & (df["label"] != "")]
@@ -62,19 +49,19 @@ def train() -> Path:
     if df["label"].nunique() < 2:
         raise ValueError("Training requires at least two different labels.")
 
-    pipeline = Pipeline(
-        steps=[
-            ("tfidf", TfidfVectorizer(ngram_range=(1, 2), min_df=1, max_features=20000)),
+    model = Pipeline(
+        [
+            ("tfidf", TfidfVectorizer(lowercase=True, ngram_range=(1, 2), min_df=1, max_features=20000)),
             ("classifier", LogisticRegression(max_iter=1000, class_weight="balanced")),
         ]
     )
-    pipeline.fit(df["text"], df["label"])
+    model.fit(df["text"], df["label"])
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump(pipeline, output_path)
-    return output_path
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, MODEL_PATH)
+    return MODEL_PATH
 
 
 if __name__ == "__main__":
-    model_file = train()
-    print(f"Saved document classifier to {model_file}")
+    model_path = train()
+    print(f"Saved document classifier to {model_path}")

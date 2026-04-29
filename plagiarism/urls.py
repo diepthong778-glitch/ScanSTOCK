@@ -1,9 +1,6 @@
 from django.urls import path
-
-from plagiarism.views import PlagiarismCheckAPIView
-
+from .views import check_plagiarism_api
 
 urlpatterns = [
-    path("check", PlagiarismCheckAPIView.as_view(), name="plagiarism-check-no-slash"),
-    path("check/", PlagiarismCheckAPIView.as_view(), name="plagiarism-check"),
+    path("check/", check_plagiarism_api, name="check-plagiarism"),
 ]
